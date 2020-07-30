@@ -1,0 +1,70 @@
+{% extends "blog/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+{% comment %} <div class="d-sm-flex align-items-center justify-content-between mb-4 col-md-12">
+    <h1 class="h3 mb-0 text-gray-800">My Profile</h1>
+</div> {% endcomment %}
+<div class="card shadow mb-4 col-md-12">
+  <div class="card-header py-3">
+    <div class="col-md-4"  style="text-align:center">
+      <img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
+      <div class="media-body">
+        <h2 class="account-heading">{{ user.username }}</h2>
+        <p class="text-secondary">{{ user.email }}</p>
+      </div>
+    </div>
+
+  </div>
+  <div class="card-body">
+    <form method="POST" enctype="multipart/form-data" id="profileForm"
+      data-provinces-url="{% url 'ajax_load_provinces' %}" data-cities-url="{% url 'ajax_load_cities' %}">
+      {% csrf_token %}
+      <fieldset class="form-group">
+        <legend class="border-bottom mb-4">Personal Info</legend>
+        {{ u_form|crispy }}
+        {% crispy p_form %}
+        <!-- {{ p_form|crispy }} -->
+      </fieldset>
+      <!-- <div class="form-group">
+                <button class="btn btn-outline-info" type="submit">Update</button>
+            </div> -->
+    </form>
+  </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $("#id_country").change(function () {
+      var url = $("#profileForm").attr("data-provinces-url"); // get the url of the `load_provinces` view
+      var countryId = $(this).val(); // get the selected country ID from the HTML input
+
+      $.ajax({ // initialize an AJAX request
+        url: url, // set the url of the request (= localhost:8000/..../load-province/)
+        data: {
+          'country': countryId // add the country id to the GET parameters
+        },
+        success: function (data) { // `data` is the return of the `load_provinces` view function
+          $("#id_province").html(
+            data); // replace the contents of the province input with the data that came from the server
+        }
+      });
+    });
+
+    $("#id_province").change(function () {
+      var url = $("#profileForm").attr("data-cities-url"); // get the url of the `load_cities` view
+      var provinceId = $(this).val(); // get the selected province ID from the HTML input
+
+      $.ajax({ // initialize an AJAX request
+        url: url, // set the url of the request (= localhost:8000/..../master/load-cities/)
+        data: {
+          'province': provinceId // add the province id to the GET parameters
+        },
+        success: function (data) { // `data` is the return of the `load_cities` view function
+          $("#id_city").html(
+            data); // replace the contents of the city input with the data that came from the server
+        }
+      });
+    });
+  })
+</script>
+{% endblock content%}

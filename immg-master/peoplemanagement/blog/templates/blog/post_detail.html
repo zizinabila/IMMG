@@ -1,0 +1,26 @@
+{% extends "blog/base.html" %}
+{% block content %}
+<article class="media content-section">
+  <img class="rounded-circle article-img" src="{{ post.author.profile.image.url }}">
+  <div class="media-body">
+    <div class="article-metadata">
+      <a class="badge badge-pill badge-primary" href="{% url 'post-user-list' post.author %}">{{ post.author }}</a>
+      <a class="badge badge-pill badge-info"
+        href="{% url 'post-category-list' post.category.slug %}">{{ post.category.category_desc}}</a>
+      <small class="badge badge-pill badge-dark">{{ post.date_posted|date:"F d, Y" }}</small>
+    </div>
+    {% if user.is_authenticated %}
+    {% if user.role.role.role_code in 'blogstaff, admin, superadmin' %}
+    <div>
+      <a class="btn btn-secondary btn-sm mt-1 mb-1" href="#">Update</a>
+      <a class="btn btn-danger btn-sm mt-1 mb-1" href="#">Delete</a>
+    </div>
+    {% endif %}
+    {% endif %}
+    <h2 class="article-title">{{ post.title }}</h2>
+    <img class="img-fluid" style="width:600px;height:300px;float:left;margin-right:10px;" src="{{ post.image.url }}">
+    {{ post.content | safe}}
+  </div>
+</article>
+{% endblock content %} 
+
